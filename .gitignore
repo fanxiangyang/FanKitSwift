@@ -16,8 +16,8 @@ DemoObject/DemoObject.xcodeproj/xcuserdata/
 
 *.xcodeproj/xcshareddata/
 *.xcworkspace/xcshareddata/
-
-Demo
+Demo/Demo.xcodeproj/project.xcworkspace/xcshareddata/
+DemoObject/DemoObject.xcodeproj/project.xcworkspace/xcshareddata/
 
 # 编辑器配置文件
 .idea
