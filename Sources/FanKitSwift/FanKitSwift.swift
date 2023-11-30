@@ -12,13 +12,13 @@ public func FanStringTable(key:String,tab:String?) -> String{
     return NSLocalizedString(key,tableName: tab, comment: key)
 }
 //MARK: -  Bundle 获取文件路径
-///自动获取bundle全名路径 user@2x.png  -bundle
-public func FanPath(fileAllName fileName:String) -> String {
-    return Bundle.main.path(forResource: fileName.fan_fileName , ofType: fileName.fan_pathExtension) ?? ""
-}
 ///自动获取bundle全名路径 user@2x.png(有子文件夹)  -bundle
 public func FanPath(fileAllName fileName:String,subPath:String? = nil) -> String {
-    return Bundle.main.path(forResource: fileName.fan_fileName , ofType: fileName.fan_pathExtension ,inDirectory: subPath) ?? ""
+    if (subPath != nil) {
+        return Bundle.main.path(forResource: fileName.fan_fileName , ofType: fileName.fan_pathExtension ,inDirectory: subPath) ?? ""
+    }else{
+        return Bundle.main.path(forResource: fileName.fan_fileName , ofType: fileName.fan_pathExtension) ?? ""
+    }
 }
 ///自动获取@2x,@3x图片路径(只有文件名)  -bundle
 public func FanPath(fileName:String) -> String {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CommonCrypto
 
 
 //MARK: - NSDictionary处理
@@ -346,6 +347,31 @@ public extension Data{
         let data = Data(bytes: arr, count: self.count)
         return data
     }
+    //MARK: - Data转16进制字符串
+    /// Data转16进制字符串
+    var fan_hexString:String {
+        //方法一
+//        var str:String = ""
+//        for b in self {
+//            str = str + String(format: "%02X" , b)
+//        }
+//        return str
+        //方法二
+        return map {
+            String(format: "%02X" , $0)
+        }.joined(separator: "")
+    }
+    ///获取字符串Md5
+    var fan_md5:String{
+        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
+        _ = self.withUnsafeBytes { bytes in
+            return CC_MD5(bytes.baseAddress,CC_LONG(self.count),&digest)
+        }
+        return digest.map {
+            String(format:"%02x",$0)
+        }.joined()
+    }
+
 }
 
 public func testData() {
@@ -371,5 +397,13 @@ public func testData() {
     let dataf32 = Data.fan_packFloat32(f32,bigEndian: true)
     let desData = dataf32.fan_des
     
-    
+    print("16进制字符串：\(data16.fan_hexString)")
+    let hexData = data16.fan_hexString.fan_hexData
+    print("16进制字符串-Data：\(hexData)")
+    print("16进制字符串-Int：\("01000001".fan_hexToInt)")
+    print("16进制字符串-ASC：\("342b3c41".fan_hexToAscString)")
+
+
+    print("MD5字符串：\("01000001".fan_md5)")
+
 }
