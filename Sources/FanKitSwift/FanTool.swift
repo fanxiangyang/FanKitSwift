@@ -6,7 +6,11 @@
 //
 
 import Foundation
-
+let IOS_CELLULAR: String = "pdp_ip0"
+let IOS_WIFI: String = "en0"
+let IOS_VPN: String = "utun0"
+let IP_ADDR_IPv4: String = "ipv4"
+let IP_ADDR_IPv6: String = "ipv6"
 /// 工具方法
 public class FanTool: NSObject {
     //MARK: - Json字符串处理
@@ -434,14 +438,32 @@ public extension FanTool {
                             
                         }else if family == UInt8(AF_INET6) {
 //                            maxCount = NI_MAXSERV
-                            var addr = face.ifa_addr.pointee
+//                            var addr = face.ifa_addr.pointee
+//                            //存放Ip地址buffer
+//                            var addrBuf:[CChar] = [CChar](repeating: 0, count: Int(maxCount))
+//                            getnameinfo(&addr, socklen_t(addr.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST|NI_NUMERICSERV)
+//                            let key1 = name + "/ipv6"
+//                            let value1 = String(cString: addrBuf)
+//                            print("ipv666:=========   "+value1)
+//                            addresses[key1] = value1
+                            maxCount = INET6_ADDRSTRLEN
+//                            var addr = face.ifa_addr.pointee
                             //存放Ip地址buffer
                             var addrBuf:[CChar] = [CChar](repeating: 0, count: Int(maxCount))
-                            getnameinfo(&addr, socklen_t(addr.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST|NI_NUMERICSERV)
+                            inet_ntop(Int32(family), face.ifa_addr, &addrBuf, socklen_t(maxCount))
                             let key1 = name + "/ipv6"
                             let value1 = String(cString: addrBuf)
-                            print("ipv666:=========   "+value1)
+                            print("ipv6:=========   \(value1)")
                             addresses[key1] = value1
+//                            var error: Int32 = 0
+//                            if getnameinfo(&addr, socklen_t(addr.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST) != 0 {
+//                                print("Error: \(error)")
+//                            } else {
+//                                let key1 = name + "/ipv6"
+//                                let value1 = String(cString: addrBuf)
+//                                print("ipv6:=========   \(value1)")
+//                                addresses[key1] = value1
+//                            }
                             
 //                            let ipAddress = Data(bytes: &addr.sa_data, count: MemoryLayout<sockaddr_in6>.size)
 //                            let ipString = ipAddress.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> String in
@@ -467,8 +489,4 @@ public extension FanTool {
         
         return addresses
     }
-}
-public func testToolWifi(){
-//    print("所有IP地址：\(FanTool.fan_allIPAddress())")
-    
 }

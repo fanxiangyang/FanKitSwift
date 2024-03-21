@@ -51,6 +51,9 @@ public func FanFont(medium size:CGFloat) -> UIFont {
 public func FanFont(bold size:CGFloat) -> UIFont {
     return UIFont.boldSystemFont(ofSize: size)
 }
+public func FanFont(semibold size:CGFloat) -> UIFont {
+    return UIFont.systemFont(ofSize: size, weight: .semibold)
+}
 /// 自定义字体名称
 public func FanFont(name:String, size:CGFloat) -> UIFont {
     return UIFont(name: name, size: size) ?? UIFont.systemFont(ofSize: 14)

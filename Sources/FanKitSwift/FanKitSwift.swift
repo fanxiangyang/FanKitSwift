@@ -34,6 +34,25 @@ public func FanPath(bundleName:String,fileName:String) -> String {
     return FanBundle(bundleName)?.resourcePath?.appending("/\(fileName)") ?? ""
 }
 
+//MARK: -  数据Data与Int转换
+
+///泛型整型数据转成data
+func fan_toData<T: ExpressibleByIntegerLiteral>(value: T) -> Data {
+    var temp = value
+    return Data(bytes: &temp, count: MemoryLayout.size(ofValue: value))
+}
+/// data转泛型整型
+func fan_toIntValue<T: ExpressibleByIntegerLiteral>(data: Data) -> T {
+    var temp: T = 0
+    let length = MemoryLayout.size(ofValue: temp)
+    guard data.count >= length else {
+        return temp
+    }
+    temp = data[0..<length].withUnsafeBytes {
+        $0.load(as: T.self)
+    }
+    return temp
+}
 //MARK: -  全局引用类快捷调用方法
 
 

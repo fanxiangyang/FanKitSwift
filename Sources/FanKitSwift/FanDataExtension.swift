@@ -373,37 +373,35 @@ public extension Data{
     }
 
 }
-
-public func testData() {
-    let dic = ["a":"b","data":["abc","xxx"]] as NSDictionary
-    let a = dic.fan_bool("data")
-    let arr:[Any] = dic.fan_array("data")
-    var arr1 = dic.fan_nsarray("data")
-    arr1 = ["aa"]
-    let dic2:NSDictionary = [:]
+/// 整型数据转Data
+extension ExpressibleByIntegerLiteral {
+    /// 直接获取数据Data
+    var fan_data: Data {
+        fan_toData(value: self)
+    }
+}
+extension Data {
+    var fan_int32: Int32 {
+        fan_toIntValue(data: self)
+    }
     
-    print("判断是否是小端：\(Data.fan_isLittleEndian())")
+    var fan_uint32: UInt32 {
+        fan_toIntValue(data: self)
+    }
     
-    let a16:Int16 = 0x0102
-    let data16 = Data.fan_packInt16(a16)
-    print("Data生成：",data16,data16.fan_unpackInt16(bigEndian: true))
-    var result = Int16(bigEndian: data16.withUnsafeBytes({d in
-        d.load(as: Int16.self)
-    }))
-    result = Int16(bigEndian: a16)
-    print("Data生成Int16：",result)
+    var fan_int16: Int16 {
+        fan_toIntValue(data: self)
+    }
     
-    let f32:Float32 = 0.19
-    let dataf32 = Data.fan_packFloat32(f32,bigEndian: true)
-    let desData = dataf32.fan_des
+    var fan_uint16: UInt16 {
+        fan_toIntValue(data: self)
+    }
     
-    print("16进制字符串：\(data16.fan_hexString)")
-    let hexData = data16.fan_hexString.fan_hexData
-    print("16进制字符串-Data：\(hexData)")
-    print("16进制字符串-Int：\("01000001".fan_hexToInt)")
-    print("16进制字符串-ASC：\("342b3c41".fan_hexToAscString)")
-
-
-    print("MD5字符串：\("01000001".fan_md5)")
-
+    var fan_int8: Int8 {
+        fan_toIntValue(data: self)
+    }
+    
+    var fan_uint8: UInt8 {
+        fan_toIntValue(data: self)
+    }
 }

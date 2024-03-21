@@ -18,6 +18,9 @@ final class FanKitSwiftUITests: XCTestCase {
     }
 
     func testExample() throws {
+        ///需要 tagart 程序才可以测试UI相关的功能
+        let app = XCUIApplication()
+        app.launch()
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         // Any test you write for XCTest can be annotated as throws and async.

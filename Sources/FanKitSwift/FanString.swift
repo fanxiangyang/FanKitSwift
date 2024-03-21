@@ -11,7 +11,7 @@ import Foundation
 
 public extension String {
     
-    /// 获取随机字符串
+    /// 获取随机字符串(a-zA-Z0-9)
     init (randomLen:Int) {
         let randomStr:String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
         var result:String = ""
