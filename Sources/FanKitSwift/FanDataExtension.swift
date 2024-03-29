@@ -374,13 +374,13 @@ public extension Data{
 
 }
 /// 整型数据转Data
-extension ExpressibleByIntegerLiteral {
+public extension ExpressibleByIntegerLiteral {
     /// 直接获取数据Data
     var fan_data: Data {
         fan_toData(value: self)
     }
 }
-extension Data {
+public extension Data {
     var fan_int32: Int32 {
         fan_toIntValue(data: self)
     }

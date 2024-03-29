@@ -152,7 +152,7 @@ public class FanUIKit : NSObject {
         return kWindow
     }
     /// 适配screen
-    public class func fan_mainScreen() -> UIScreen? {
+    public class func fan_mainScreen() -> UIScreen {
         if #available(iOS 13.0, *) {
             if let wScene = FanUIKit.fan_activeWindowScene() {
                 return wScene.screen

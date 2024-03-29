@@ -6,11 +6,16 @@
 //
 
 import Foundation
-let IOS_CELLULAR: String = "pdp_ip0"
-let IOS_WIFI: String = "en0"
-let IOS_VPN: String = "utun0"
-let IP_ADDR_IPv4: String = "ipv4"
-let IP_ADDR_IPv6: String = "ipv6"
+
+/// 本机IP地址类型
+public enum FanIPType : String {
+    case wifiIpv4 = "en0/ipv4"
+    case wifiIpv6 = "en0/ipv6"
+    case cellularIpv4 = "pdp_ip0/ipv4"
+    case cellularIpv6 = "pdp_ip0/ipv6"
+    case vpnIpv4 = "utun0/ipv4"
+    case vpnIpv6 = "utun0/ipv6"
+}
 /// 工具方法
 public class FanTool: NSObject {
     //MARK: - Json字符串处理
@@ -342,9 +347,9 @@ public class FanTool: NSObject {
 
 
 }
+//MARK: - 数学公式
 /// 数学公式
 public extension FanTool {
-    //MARK: - 数学公式
     
     /// 获取三次Hermite插值函数y
     /// - Parameters:
@@ -387,10 +392,8 @@ public extension FanTool {
         return b;
     }
 }
-
+//MARK: - WiFi地址相关
 public extension FanTool {
-    //MARK: - WiFi地址相关
-    
 //    en0/ipv4 = 192.168.0.40;
 //    llw0/ipv6 = fe80::9851:47ff:fef8:4eec;
 //    en2/ipv6 = fe80::1037:dd02:a7c5:d3b;
@@ -402,7 +405,7 @@ public extension FanTool {
 //    lo0/ipv4 = 127.0.0.1;
 //    utun0/ipv6 = fe80::6753:53a5:3753:2eb8
     
-    /// 获取所有IP地址  目前此方法有问题
+    /// 获取所有IP地址
     static func fan_allIPAddress() -> [String:String] {
         var addresses = [String:String]()
         var interfaces:UnsafeMutablePointer<ifaddrs>?
@@ -415,66 +418,43 @@ public extension FanTool {
                         let name = String(cString: face.ifa_name)
                         let flags = Int32(face.ifa_flags)
                         if ((flags & IFF_UP) == 0) {
-                            print("不符合的flags name：\(name)")
+//                            print("不符合的flags name：\(name)")
                             faceP = faceP?.pointee.ifa_next
                             continue
                         }
-//                        print("打印遍历：\(name)")
 
-                        //                    if (flags & (IFF_UP|IFF_RUNNING|IFF_LOOPBACK)) == (IFF_UP|IFF_RUNNING) {
-                        //                    }
-                        //NI_MAXHOST = 1025  max= 46
-                        var maxCount = max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN)
+//                        if (flags & (IFF_UP|IFF_RUNNING|IFF_LOOPBACK)) == (IFF_UP|IFF_RUNNING) {
+//                        }
+                        //NI_MAXHOST = 1025  max= 46 INET_ADDRSTRLEN=16 INET6_ADDRSTRLEN=46
+                        
+                        let maxCount = max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN)
                         let family = face.ifa_addr.pointee.sa_family
                         if family == UInt8(AF_INET)  {
-                            var addr = face.ifa_addr.pointee
                             //存放Ip地址buffer
                             var addrBuf:[CChar] = [CChar](repeating: 0, count: Int(maxCount))
-                            getnameinfo(&addr, socklen_t(addr.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST)
+                            getnameinfo(face.ifa_addr, socklen_t(face.ifa_addr.pointee.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST)
                             let key = name + "/ipv4"
                             let value = String(cString: addrBuf)
-                            print("ipv4:=========   "+value)
+//                            print("\(key):"+value)
                             addresses[key] = value
                             
                         }else if family == UInt8(AF_INET6) {
-//                            maxCount = NI_MAXSERV
-//                            var addr = face.ifa_addr.pointee
-//                            //存放Ip地址buffer
-//                            var addrBuf:[CChar] = [CChar](repeating: 0, count: Int(maxCount))
-//                            getnameinfo(&addr, socklen_t(addr.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST|NI_NUMERICSERV)
-//                            let key1 = name + "/ipv6"
-//                            let value1 = String(cString: addrBuf)
-//                            print("ipv666:=========   "+value1)
-//                            addresses[key1] = value1
-                            maxCount = INET6_ADDRSTRLEN
-//                            var addr = face.ifa_addr.pointee
                             //存放Ip地址buffer
                             var addrBuf:[CChar] = [CChar](repeating: 0, count: Int(maxCount))
-                            inet_ntop(Int32(family), face.ifa_addr, &addrBuf, socklen_t(maxCount))
-                            let key1 = name + "/ipv6"
-                            let value1 = String(cString: addrBuf)
-                            print("ipv6:=========   \(value1)")
-                            addresses[key1] = value1
-//                            var error: Int32 = 0
-//                            if getnameinfo(&addr, socklen_t(addr.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST) != 0 {
-//                                print("Error: \(error)")
-//                            } else {
-//                                let key1 = name + "/ipv6"
-//                                let value1 = String(cString: addrBuf)
-//                                print("ipv6:=========   \(value1)")
-//                                addresses[key1] = value1
+                            getnameinfo(face.ifa_addr, socklen_t(face.ifa_addr.pointee.sa_len), &addrBuf, socklen_t(addrBuf.count), nil, socklen_t(0), NI_NUMERICHOST)
+                            let key = name + "/ipv6"
+                            var value = String(cString: addrBuf)
+                            value = value.replacingOccurrences(of: "%"+name, with: "")
+//                            print("\(key):"+value)
+                            addresses[key] = value
+                            //一种转换方法
+//                            var s6_addr = face.ifa_addr.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) {
+//                                $0.pointee.sin6_addr.__u6_addr.__u6_addr8
 //                            }
-                            
-//                            let ipAddress = Data(bytes: &addr.sa_data, count: MemoryLayout<sockaddr_in6>.size)
-//                            let ipString = ipAddress.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> String in
-//                                var addrBuf:[CChar] = [CChar](repeating: 0, count: Int(maxCount))
-//                                let pointer = bytes.bindMemory(to: sockaddr_in6.self).baseAddress
-//                                _ = inet_ntop(AF_INET6, pointer, &addrBuf, socklen_t(MemoryLayout<sockaddr_in6>.size))
-//                                return String(cString: addrBuf)
+//                            //Swift 没有导入 netinet6/in6.h 定义宏
+//                            //#define IN6_IS_ADDR_LINKLOCAL(a)   (((a)->s6_addr[0] == 0xfe) && (((a)->s6_addr[1] & 0xc0) == 0x80))
+//                            if s6_addr.0 == 0xfe && (s6_addr.1 & 0xc0) == 0x80 {
 //                            }
-//                            print("ipv6:===========  "+ipString)
-//                            let key = name + "/ipv6"
-//                            addresses[key] = ipString
                         }
                     }
                     faceP = faceP?.pointee.ifa_next
@@ -482,11 +462,12 @@ public extension FanTool {
             }
         }
         freeifaddrs(interfaces)
-        
-        
-        // 返回第一个非本地回环 IP 地址（如果有127.）
-        
-        
         return addresses
+    }
+    /// 获取本机IP地址 默认是WiFi的ipv4
+    static func fan_ipAddress(_ ipType:FanIPType = .wifiIpv4) -> String? {
+        let dic = fan_allIPAddress()
+        let ip = dic[ipType.rawValue]
+        return ip
     }
 }

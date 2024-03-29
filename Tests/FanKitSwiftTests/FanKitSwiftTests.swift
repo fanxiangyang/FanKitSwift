@@ -107,6 +107,6 @@ final class FanKitSwiftTests: XCTestCase {
     }
     public func testToolWifi() throws{
         print("所有IP地址：\(FanTool.fan_allIPAddress())")
-        
+        print("本地IP地址：\(FanTool.fan_ipAddress(.wifiIpv4) ?? "")")
     }
 }
