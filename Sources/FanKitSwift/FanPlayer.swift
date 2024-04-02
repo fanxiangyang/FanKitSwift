@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import AVFoundation
 ///视频播放的View层
-public class FanPlayerView: UIView {
+@objcMembers public class FanPlayerView: UIView {
     ///视频播放的层
     public private(set) var playerLayer:AVPlayerLayer?
     
@@ -24,7 +24,7 @@ public class FanPlayerView: UIView {
         }
         playerLayer?.removeFromSuperlayer()
         playerLayer = layer;
-        playerLayer?.contentsScale = FanUIKit.fan_mainScreen().scale
+        playerLayer?.contentsScale = FanUIKitTool.fan_mainScreen().scale
         self.layer.insertSublayer(layer, at: 0)
         setNeedsLayout()
     }
@@ -34,7 +34,7 @@ public class FanPlayerView: UIView {
     }
 }
 ///视频播放的
-public class FanPlayer:NSObject{
+@objcMembers public class FanPlayer:NSObject{
     ///播放视频的View-需要提前初始化
     public weak var playerView:FanPlayerView?
     ///初始化View

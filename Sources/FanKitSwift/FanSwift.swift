@@ -54,13 +54,3 @@ public func fan_toIntValue<T: ExpressibleByIntegerLiteral>(data: Data) -> T {
     return temp
 }
 //MARK: -  全局引用类快捷调用方法
-
-
-
-
-public struct FanKitSwift {
-    public private(set) var text = "Hello, World!"
-
-    public init() {
-    }
-}

@@ -6,12 +6,15 @@ A Swift Tool Kit collection of iOS components(一个iOS Swift 集成实用工具
 ## Introduce（介绍）
 
 FanKitSwift 是一组庞大、功能丰富的 iOS 组件。
+对于OC支持，部分类功能做了兼容，一些全局方法 没有做适配，建议自己直接写成宏，
+或内联函数，或者用到部分函数自己再用类封装一层
 
 目前只是实现了一些常用的方法，SwiftUI的相关东西还没有整理。下面是一些基本功能
 
-* FanKitSwift — 公共全局方法。
-* FanUIKit — UIKit相关的全局调用+基本方法。
-* FanTool	— UI方面的类及工厂方法。
+* FanSwift — 公共Foundation全局方法。
+* FanTool    — Foundation框架的类及工厂方法。
+* FanUIKitHead — 公共UIKit全局方法。
+* FanUIKitTool — UIKit工具类相关的基本方法。
 * FanString — String相关扩展
 * FanDataExtension Data Int数据转换
 * FanImageExtension 图片裁剪+缩放+截图等方法
@@ -37,7 +40,8 @@ FanKitSwift该项目最低支持 iOS 12.0。
 
 
 ### Function Example(功能事例)
-后期会放demo链接，目前一些基础的测试在Tests里面
+目前一些基础的测试在Tests里面
+测试demo [FanKitDemo](https://github.com/fanxiangyang/FanKitDemo)
 
 更新历史(Version Update)
 ==============

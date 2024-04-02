@@ -10,7 +10,7 @@ import UIKit
 
 //MARK: - UIView相关扩展
 
-public extension UIView {
+@objc public extension UIView {
     
     ///给View 添加Tap手势
     func fan_addTapGesture(target:Any?,action:Selector?) {
@@ -20,25 +20,25 @@ public extension UIView {
     }
 }
 
-public extension UIViewController {
-    
-    func fan_statusbarHeight() -> CGFloat {
+@objc public extension UIViewController {
+    ///状态栏高度
+    func fan_statusBarH() -> CGFloat {
         if #available(iOS 13.0, *) {
-            return FanUIKit.fan_activeWindowScene()?.statusBarManager?.statusBarFrame.size.height ?? 20.0
+            return FanUIKitTool.fan_activeWindowScene()?.statusBarManager?.statusBarFrame.size.height ?? 20.0
         } else {
             return UIApplication.shared.statusBarFrame.size.height
         }
     }
-    
-    func fan_navigationHeight() -> CGFloat {
+    /// 导航栏高度
+    func fan_navHeight() -> CGFloat {
         if #available(iOS 13.0, *) {
-            return (FanUIKit.fan_activeWindowScene()?.statusBarManager?.statusBarFrame.size.height ?? 20.0) + (navigationController?.navigationBar.frame.size.height ?? 44.0)
+            return (FanUIKitTool.fan_activeWindowScene()?.statusBarManager?.statusBarFrame.size.height ?? 20.0) + (navigationController?.navigationBar.frame.size.height ?? 44.0)
         } else {
             return UIApplication.shared.statusBarFrame.size.height + (navigationController?.navigationBar.frame.size.height ?? 44.0)
         }
     }
-    
-    func fan_tabBarHeight() -> CGFloat {
+    /// tabBar高度
+    func fan_tabBarH() -> CGFloat {
         return tabBarController?.tabBar.frame.size.height ?? 49.0
     }
     

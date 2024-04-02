@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 //MARK: - 图片扩展方法
-public extension UIImage {
+@objc public extension UIImage {
     
     //MARK: - 图片缩放裁剪
     

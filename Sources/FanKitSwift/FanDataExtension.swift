@@ -11,7 +11,7 @@ import CommonCrypto
 
 //MARK: - NSDictionary处理
 /// NSDictionary读取扩展
-public extension NSDictionary{
+@objc public extension NSDictionary{
     ///字典转bool
     func fan_bool(_ forkey:Any) -> Bool {
         let rs = self.object(forKey: forkey)

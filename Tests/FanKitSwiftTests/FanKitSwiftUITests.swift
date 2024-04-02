@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import FanKitSwift
 
 final class FanKitSwiftUITests: XCTestCase {
 

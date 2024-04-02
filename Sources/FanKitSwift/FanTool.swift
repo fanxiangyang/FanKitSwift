@@ -17,12 +17,12 @@ public enum FanIPType : String {
     case vpnIpv6 = "utun0/ipv6"
 }
 /// 工具方法
-public class FanTool: NSObject {
+@objcMembers public class FanTool: NSObject {
     //MARK: - Json字符串处理
     /// JSON字符串转字典
     public static func fan_dic(_ jsonStr:String?)->[String : Any]?{
         let data = jsonStr?.data(using: .utf8)
-        return fan_dic(data)
+        return fan_dic(jsonData: data)
     }
     /// json文件路径转字典
     public static func fan_dic(jsonPath:String?)->[String : Any]?{
@@ -33,13 +33,13 @@ public class FanTool: NSObject {
             let url = URL(fanFilePath: jsonPath)
             if let url = url {
                 let data = try? Data(contentsOf:url)
-                return fan_dic(data)
+                return fan_dic(jsonData: data)
             }
         }
         return nil
     }
     /// jsonData转字典
-    public static func fan_dic(_ jsonData:Data?)->[String : Any]?{
+    public static func fan_dic(jsonData:Data?)->[String : Any]?{
         guard let data = jsonData else{
             return nil
         }
@@ -55,7 +55,7 @@ public class FanTool: NSObject {
     /// JSON字符串转字典
     public static func fan_array(_ jsonStr:String?)->[Any]?{
         let data = jsonStr?.data(using: .utf8)
-        return fan_array(data)
+        return fan_array(jsonData: data)
     }
     /// json文件路径转字典
     public static func fan_array(jsonPath:String?)->[Any]?{
@@ -66,13 +66,13 @@ public class FanTool: NSObject {
             let url = URL(fanFilePath: jsonPath)
             if let url = url {
                 let data = try? Data(contentsOf:url)
-                return fan_array(data)
+                return fan_array(jsonData: data)
             }
         }
         return nil
     }
     /// jsonData转字典
-    public static func fan_array(_ jsonData:Data?)->[Any]?{
+    public static func fan_array(jsonData:Data?)->[Any]?{
         guard let data = jsonData else{
             return nil
         }

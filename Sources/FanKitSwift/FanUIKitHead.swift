@@ -38,6 +38,19 @@ public func FanColor(hex: String,_ alpha:CGFloat = 1.0) -> UIColor {
     Scanner(string: hexFormatted).scanHexInt64(&rgbValue)
     return UIColor(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0, green: CGFloat((rgbValue & 0x00FF00) >> 8)/255.0, blue: CGFloat(rgbValue & 0x0000FF) / 255.0, alpha: alpha)
 }
+/// UIColor转换成 #ffffff
+public func FanHexString(_ color: UIColor) -> String {
+    var red: CGFloat = 0.0
+    var green: CGFloat = 0.0
+    var blue: CGFloat = 0.0
+    var alpha: CGFloat = 0.0
+    let success = color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+    if success {
+        let rgbString = String(format: "#%02x%02x%02x", Int(red * 255.0), Int(green * 255.0), Int(blue * 255.0))
+        return rgbString
+    }
+    return "#ffffff"
+}
 //MARK: -  UIFont相关方法
 /// 系统常规字体
 public func FanFont(_ size:CGFloat) -> UIFont {
@@ -83,84 +96,3 @@ public func FanImage(bundleName : String,fileName:String) -> UIImage? {
 //MARK: -  全局引用类快捷调用方法
 
 
-//MARK: -  关于UIKit的工具方法
-/// 关于UIKit的工具方法
-public class FanUIKit : NSObject {
-    /// UIColor转换成 #ffffff
-    public class func fan_hexString(_ color: UIColor) -> String {
-        var red: CGFloat = 0.0
-        var green: CGFloat = 0.0
-        var blue: CGFloat = 0.0
-        var alpha: CGFloat = 0.0
-        let success = color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        if success {
-            let rgbString = String(format: "#%02x%02x%02x", Int(red * 255.0), Int(green * 255.0), Int(blue * 255.0))
-            return rgbString
-        }
-        return "#ffffff"
-    }
-    
-    //MARK: - UIWindow相关
-    
-    @available(iOS 13.0, *)
-    /// ///获取活跃的windowScene
-    /// - Returns: UIWindowScene
-    public class func fan_activeWindowScene() -> UIWindowScene? {
-        var actWindowScene: UIWindowScene?
-        for windowScene in UIApplication.shared.connectedScenes {
-            guard let windowScene = windowScene as? UIWindowScene else {
-                continue
-            }
-            if windowScene.activationState == .foregroundActive {
-                actWindowScene = windowScene
-                break
-            }
-        }
-        if actWindowScene == nil {
-            for windowScene in UIApplication.shared.connectedScenes {
-                guard let windowScene = windowScene as? UIWindowScene else {
-                    continue
-                }
-                actWindowScene = windowScene
-                break
-            }
-        }
-        return actWindowScene
-    }
-    /// 获取keywindow
-    public class func fan_keyWindow() -> UIWindow? {
-        var kWindow: UIWindow?
-        if #available(iOS 13.0, *) {
-            if #available(iOS 15.0, *) {
-                kWindow = FanUIKit.fan_activeWindowScene()?.keyWindow
-            } else {
-                kWindow = FanUIKit.fan_activeWindowScene()?.windows.first as? UIWindow
-            }
-        } else {
-            kWindow = UIApplication.shared.keyWindow
-            if kWindow == nil {
-                if UIApplication.shared.windows.count > 0 {
-                    kWindow = UIApplication.shared.windows[0]
-                }
-            }
-        }
-        if kWindow == nil {
-            if UIApplication.shared.delegate?.responds(to: Selector(("window"))) ?? false {
-                kWindow = UIApplication.shared.delegate?.window ?? nil
-            }
-        }
-        return kWindow
-    }
-    /// 适配screen
-    public class func fan_mainScreen() -> UIScreen {
-        if #available(iOS 13.0, *) {
-            if let wScene = FanUIKit.fan_activeWindowScene() {
-                return wScene.screen
-            } else {
-                return .main
-            }
-        } else {
-            return .main
-        }
-    }
-}
