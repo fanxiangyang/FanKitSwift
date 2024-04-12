@@ -1,5 +1,5 @@
 //
-//  FanUIKit.swift
+//  FanUIKitTool.swift
 //  
 //
 //  Created by 凡向阳 on 2024/4/2.
@@ -71,6 +71,18 @@ import UIKit
             }
         } else {
             return .main
+        }
+    }
+    ///屏幕宽
+    public static var fan_width : CGFloat {
+        get {
+            return  FanUIKitTool.fan_mainScreen().bounds.width
+        }
+    }
+    ///屏幕高
+    public static var fan_height : CGFloat {
+        get {
+            return  FanUIKitTool.fan_mainScreen().bounds.height
         }
     }
 }
