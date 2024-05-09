@@ -50,7 +50,7 @@ import UIKit
 @objc public extension UIStackView {
     ///创建StackView 默认垂直居中填充
     class func fan_stackView(spacing:CGFloat,axis:NSLayoutConstraint.Axis = .vertical) -> UIStackView {
-        var stackView = UIStackView()
+        let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.distribution = .fill
         stackView.alignment = .center
@@ -108,7 +108,7 @@ import UIKit
 @objc public extension UIButton {
     ///创建只有文本的按钮+内间距 （文本只支持单行和多行，不支持固定2行）
     class func fan_btn(title:String?,textColor:UIColor,font:UIFont,edge:UIEdgeInsets = .zero) -> UIButton {
-        var btn = UIButton(type: .custom)
+        let btn = UIButton(type: .custom)
         btn.setTitle(title, for: .normal)
         btn.titleLabel?.font = font
         btn.setTitleColor(textColor, for: .normal)
@@ -117,7 +117,7 @@ import UIKit
             config.contentInsets = NSDirectionalEdgeInsets(top: edge.top, leading: edge.left, bottom: edge.bottom, trailing: edge.right)
             config.imagePadding = 0
             config.titleTextAttributesTransformer =  .init({ container in
-                var newContainer = container ?? AttributeContainer()
+                var newContainer = container
                 newContainer.foregroundColor = textColor
                 newContainer.font = font
                 return newContainer
@@ -133,7 +133,7 @@ import UIKit
     }
     /// 创建只有图片的按钮+内间距
     class func fan_btn(imageName:String,edge:UIEdgeInsets = .zero) -> UIButton {
-        var btn = UIButton(type: .custom)
+        let btn = UIButton(type: .custom)
         btn.setImage(UIImage(named: imageName), for: .normal)
         if #available(iOS 15.0, *) {
             var config = Configuration.plain()
@@ -151,7 +151,7 @@ import UIKit
             var config = self.configuration
             if config != nil {
                 config?.titleTextAttributesTransformer =  .init({ container in
-                    var newContainer = container ?? AttributeContainer()
+                    var newContainer = container
                     newContainer.foregroundColor = textColor
                     newContainer.font = font
                     return newContainer

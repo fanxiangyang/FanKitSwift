@@ -15,6 +15,7 @@ FanKitSwift 是一组庞大、功能丰富的 iOS 组件。
 * FanTool    — Foundation框架的类及工厂方法。
 * FanUIKitHead — 公共UIKit全局方法。
 * FanUIKitTool — UIKit工具类相关的基本方法。
+* FanLayerTool — Layer动画+绘制Layer图形的基本方法。
 * FanString — String相关扩展
 * FanDataExtension Data Int数据转换
 * FanImageExtension 图片裁剪+缩放+截图等方法
@@ -25,7 +26,7 @@ FanKitSwift 是一组庞大、功能丰富的 iOS 组件。
 
 ### SPM（安装）支持
 
-1. git tag = `1.0.0` 初始版本
+1. git tag = `1.0.1` 初始版本
 
 ### 手动安装
 
@@ -46,6 +47,8 @@ FanKitSwift该项目最低支持 iOS 12.0。
 更新历史(Version Update)
 ==============
 
+### Release 1.0.1 
+* 1.调整文件结构+使支持OC调用
 ### Release 1.0.0 
 * 1.常用数据处理，Data,String,字典，文件
 * 2.FanPlayer 音视频播放器
