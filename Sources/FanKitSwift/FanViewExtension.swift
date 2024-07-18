@@ -46,6 +46,76 @@ import UIKit
         self.setContentCompressionResistancePriority(priority, for: .vertical)
     }
 }
+//MARK: - UIView AutoLayout约束
+
+@objc public extension UIView {
+    
+    /// 移除自己身上的约束和自己父类身上包含自己的（不完全）
+    func fan_removeConstraints(){
+        self.removeConstraints(self.constraints)
+        guard let supView = self.superview else {
+            return
+        }
+        var arr:[NSLayoutConstraint] = []
+        for constraint in supView.constraints {
+            let contain = constraint.firstItem?.isEqual(self) ?? false
+            let contain2 = constraint.secondItem?.isEqual(self) ?? false
+            if (contain||contain2) {
+                arr.append(constraint)
+            }
+        }
+        supView.removeConstraints(arr)
+        //建议用这个方法代替
+//        NSLayoutConstraint.deactivate(self.constraints)
+//        NSLayoutConstraint.deactivate(arr)
+        
+    }
+    
+    /// 添加基于父类的居中约束
+    /// - Parameters:
+    ///   - centerSize: 控件大小
+    ///   - offset: 中心偏移大小
+    func fan_addConstraint(centerSize:CGSize, offset:CGPoint = CGPointZero) {
+        guard let supView = self.superview else {
+            return
+        }
+        self.translatesAutoresizingMaskIntoConstraints = false;
+        NSLayoutConstraint.activate([
+            //锚点的形式
+            self.centerXAnchor.constraint(equalTo: supView.centerXAnchor,constant:offset.x),
+            self.centerYAnchor.constraint(equalTo: supView.centerYAnchor,constant:offset.y),
+            self.widthAnchor.constraint(equalToConstant: centerSize.width),
+            self.heightAnchor.constraint(equalToConstant: centerSize.height)
+        ])
+    }
+    
+    /// 添加基于父类的四周约束
+    /// - Parameter edge: edge间距
+    /// - Parameter safeArea: 是否开启父类的安全区域
+    func fan_addConstraint(edge:UIEdgeInsets,safeArea:Bool = false) {
+        guard let supView = self.superview else {
+            return
+        }
+        self.translatesAutoresizingMaskIntoConstraints = false;
+        if safeArea{
+            NSLayoutConstraint.activate([
+                //锚点的形式
+                self.topAnchor.constraint(equalTo: supView.safeAreaLayoutGuide.topAnchor,constant:edge.top),
+                self.leftAnchor.constraint(equalTo: supView.safeAreaLayoutGuide.leftAnchor,constant:edge.left),
+                self.bottomAnchor.constraint(equalTo: supView.safeAreaLayoutGuide.bottomAnchor,constant:-edge.bottom),
+                self.rightAnchor.constraint(equalTo: supView.safeAreaLayoutGuide.rightAnchor,constant:-edge.right)
+            ])
+        }else{
+            NSLayoutConstraint.activate([
+                //锚点的形式
+                self.topAnchor.constraint(equalTo: supView.topAnchor,constant:edge.top),
+                self.leftAnchor.constraint(equalTo: supView.leftAnchor,constant:edge.left),
+                self.bottomAnchor.constraint(equalTo: supView.bottomAnchor,constant:-edge.bottom),
+                self.rightAnchor.constraint(equalTo: supView.rightAnchor,constant:-edge.right)
+            ])
+        }
+    }
+}
 
 @objc public extension UIStackView {
     ///创建StackView 默认垂直居中填充
