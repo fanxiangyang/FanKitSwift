@@ -17,8 +17,29 @@ public func FanUIString(key:String) -> LocalizedStringKey{
     return LocalizedStringKey(key)
 }
 
+// MARK: - 字体样式
+/// 系统常规字体
+@available(iOS 13.0, *)
+public func FanSFont(_ size:CGFloat) -> Font {
+    return Font.system(size: size)
+}
+/// 系统中粗体
+@available(iOS 13.0, *)
+public func FanSFont(medium size:CGFloat) -> Font {
+    return Font.system(size: size,weight: .medium)
+}
+/// 系统粗体
+@available(iOS 13.0, *)
+public func FanSFont(bold size:CGFloat) -> Font {
+    return Font.system(size: size,weight: .bold)
+}
+/// 系统粗体
+@available(iOS 13.0, *)
+public func FanSFont(semibold size:CGFloat) -> Font {
+    return Font.system(size: size,weight: .semibold)
+}
 
-//MARK: - View扩展Task方法在iOS13-iOS15
+//MARK: - View扩展系统自带的方法例如 Task方法在iOS13-iOS15
 #if canImport(_Concurrency)
 import _Concurrency
 
@@ -35,11 +56,6 @@ public extension View {
     func task<T>(id value: T, priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async -> Void) -> some View where T: Equatable {
         modifier(_fanTaskValueModifier(value: value, priority: priority, action: action))
     }
-    ///设置字体颜色
-    func fan_textColor(_ color:Color) -> some View {
-        modifier(FanTextColorModifier(color))
-    }
-    
 }
 
 @available(iOS 13,*)
@@ -92,9 +108,23 @@ private struct _fanTaskValueModifier<Value>: ViewModifier where Value: Equatable
     }
 }
 #endif
-
-
-//MARK: - UI风格
+//MARK: - View扩展一些常用的方法
+@available(iOS 13.0, *)
+public extension View {
+    ///设置字体颜色
+    func fan_textColor(_ color:Color) -> some View {
+        modifier(FanTextColorModifier(color))
+    }
+    ///设置覆盖层
+    func fan_overlay<V>(alignment: Alignment = .center, content: () -> V) -> some View where V : View{
+        if #available(iOS 15.0, *) {
+            return self.overlay(alignment: alignment,content: content)
+        } else {
+            return self.overlay(content(), alignment: alignment)
+        }
+    }
+}
+//MARK: - UI风格 ViewModifier
 @available(iOS 13.0.0, *)
 /// Button背景图片设置 注意图片要9宫格拉伸
 public struct FanImageBgModifier : ViewModifier {
@@ -141,4 +171,42 @@ public struct FanTextColorModifier : ViewModifier {
         }
     }
 }
-
+//MARK: - UI风格 其他协议实现
+@available(iOS 13.0, *)
+/// 自定义圆角 iOS16+可以用UnevenRoundedRectangle
+public struct FanRoundedCorner: Shape {
+    var topLeading: CGFloat
+    var bottomLeading: CGFloat
+    var bottomTrailing: CGFloat
+    var topTrailing: CGFloat
+    public init(topLeading: CGFloat = 0, bottomLeading: CGFloat = 0, bottomTrailing: CGFloat = 0, topTrailing: CGFloat = 0) {
+        self.topLeading = topLeading
+        self.bottomLeading = bottomLeading
+        self.bottomTrailing = bottomTrailing
+        self.topTrailing = topTrailing
+    }
+    public func path(in rect: CGRect) -> Path {
+        if #available(iOS 16.0, *) {
+            return Path(roundedRect: rect, cornerRadii: .init(topLeading: topLeading,bottomLeading: bottomLeading, bottomTrailing: bottomTrailing, topTrailing: topTrailing))
+        } else {
+            //避免使用UIKit里面的UIBezierPath
+            let w = rect.size.width
+            let h = rect.size.height
+            let tr = min(min(self.topTrailing, h/2), w/2)
+            let tl = min(min(self.topLeading, h/2), w/2)
+            let bl = min(min(self.bottomLeading, h/2), w/2)
+            let br = min(min(self.bottomTrailing, h/2), w/2)
+            var path = Path()
+            path.move(to: CGPoint(x: w / 2.0, y: 0))
+            path.addLine(to: CGPoint(x: w - tr, y: 0))
+            path.addArc(center: CGPoint(x: w - tr, y: tr), radius: tr, startAngle: Angle(degrees: -90), endAngle: Angle(degrees: 0), clockwise: false)
+            path.addLine(to: CGPoint(x: w, y: h - br))
+            path.addArc(center: CGPoint(x: w - br, y: h - br), radius: br, startAngle: Angle(degrees: 0), endAngle: Angle(degrees: 90), clockwise: false)
+            path.addLine(to: CGPoint(x: bl, y: h))
+            path.addArc(center: CGPoint(x: bl, y: h - bl), radius: bl, startAngle: Angle(degrees: 90), endAngle: Angle(degrees: 180), clockwise: false)
+            path.addLine(to: CGPoint(x: 0, y: tl))
+            path.addArc(center: CGPoint(x: tl, y: tl), radius: tl, startAngle: Angle(degrees: 180), endAngle: Angle(degrees: 270), clockwise: false)
+            return path
+        }
+    }
+}

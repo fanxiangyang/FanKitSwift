@@ -16,7 +16,7 @@ public extension Date {
         return formatter.date(from: dateStr)
     }
     ///日期转换成需要的格式（yyyy-MM-dd HH:mm:ss）
-    func fan_string(format:String = "yyyy-MM-dd HH:mm:ss",timeZone:TimeZone = TimeZone.current) -> String {
+    func fan_format(_ format:String = "yyyy-MM-dd HH:mm:ss",timeZone:TimeZone = TimeZone.current) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format
         formatter.timeZone = timeZone

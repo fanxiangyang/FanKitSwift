@@ -179,13 +179,11 @@ import UIKit
     ///创建只有文本的按钮+内间距 （文本只支持单行和多行，不支持固定2行）
     class func fan_btn(title:String?,textColor:UIColor,font:UIFont,edge:UIEdgeInsets = .zero) -> UIButton {
         let btn = UIButton(type: .custom)
-        btn.setTitle(title, for: .normal)
-        btn.titleLabel?.font = font
-        btn.setTitleColor(textColor, for: .normal)
         if #available(iOS 15.0, *) {
             var config = Configuration.plain()
             config.contentInsets = NSDirectionalEdgeInsets(top: edge.top, leading: edge.left, bottom: edge.bottom, trailing: edge.right)
             config.imagePadding = 0
+            config.title = title
             config.titleTextAttributesTransformer =  .init({ container in
                 var newContainer = container
                 newContainer.foregroundColor = textColor
@@ -197,6 +195,9 @@ import UIKit
 //            config.imagePlacement = .leading
             btn.configuration = config
         } else {
+            btn.setTitle(title, for: .normal)
+            btn.titleLabel?.font = font
+            btn.setTitleColor(textColor, for: .normal)
             btn.contentEdgeInsets = edge
         }
         return btn
@@ -204,34 +205,80 @@ import UIKit
     /// 创建只有图片的按钮+内间距
     class func fan_btn(imageName:String,edge:UIEdgeInsets = .zero) -> UIButton {
         let btn = UIButton(type: .custom)
-        btn.setImage(UIImage(named: imageName), for: .normal)
+        let image = UIImage(named: imageName)
         if #available(iOS 15.0, *) {
             var config = Configuration.plain()
             config.contentInsets = NSDirectionalEdgeInsets(top: edge.top, leading: edge.left, bottom: edge.bottom, trailing: edge.right)
+            config.image = image
             btn.configuration = config
         } else {
+            btn.setImage(image, for: .normal)
+            btn.contentEdgeInsets = edge
+        }
+        return btn
+    }
+    class func fan_btn(image:UIImage?,edge:UIEdgeInsets = .zero) -> UIButton {
+        let btn = UIButton(type: .custom)
+        if #available(iOS 15.0, *) {
+            var config = Configuration.plain()
+            config.contentInsets = NSDirectionalEdgeInsets(top: edge.top, leading: edge.left, bottom: edge.bottom, trailing: edge.right)
+            config.image = image
+            btn.configuration = config
+        } else {
+            btn.setImage(image, for: .normal)
             btn.contentEdgeInsets = edge
         }
         return btn
     }
     @discardableResult
-    /// 添加字体颜色+大小
-    func fan_add(textColor:UIColor,font:UIFont) -> Self{
+    /// 添加字体+颜色+字体大小 动态添加
+    func fan_add(title:String? = nil, textColor:UIColor? = nil,font:UIFont? = nil) -> Self{
         if #available(iOS 15.0, *) {
             var config = self.configuration
             if config != nil {
-                config?.titleTextAttributesTransformer =  .init({ container in
-                    var newContainer = container
-                    newContainer.foregroundColor = textColor
-                    newContainer.font = font
-                    return newContainer
-                })
+                if title != nil {
+                    config?.title = title
+                }
+                if textColor != nil || font != nil {
+                    config?.titleTextAttributesTransformer =  .init({ container in
+                        var newContainer = container
+                        if textColor != nil {
+                            newContainer.foregroundColor = textColor
+                        }
+                        if font != nil {
+                            newContainer.font = font
+                        }
+                        return newContainer
+                    })
+                }
                 self.configuration = config
                 return self
             }
         }
-        self.titleLabel?.font = font
-        self.setTitleColor(textColor, for: .normal)
+       
+        if title != nil {
+            self.setTitle(title, for: .normal)
+        }
+        if textColor != nil {
+            self.setTitleColor(textColor, for: .normal)
+        }
+        if font != nil {
+            self.titleLabel?.font = font
+        }
+        return self
+    }
+    /// 只添加富文字
+    @discardableResult
+    func fan_add(nsStr:NSAttributedString? = nil) -> Self{
+        if #available(iOS 15.0, *) {
+            var config = self.configuration
+            if config != nil  && nsStr != nil {
+                config?.attributedTitle = AttributedString(nsStr!)
+                self.configuration = config
+                return self
+            }
+        }
+        self.setAttributedTitle(nsStr, for: .normal)
         return self
     }
     @discardableResult
@@ -294,6 +341,52 @@ import UIKit
         }
         self.contentEdgeInsets = contentInsets
         self.imageEdgeInsets = imageInsets
+        return self
+    }
+    /// 添加图片
+    func fan_add(image:UIImage?) -> Self {
+        if #available(iOS 15.0, *) {
+            var config = self.configuration
+            if config != nil {
+                config?.image = image
+                self.configuration = config
+                return self
+            }
+        }
+        self.setImage(image, for: .normal)
+        return self
+    }
+    /// 添加背景图片
+    func fan_btn(bgImage:UIImage?) -> Self {
+        if #available(iOS 15.0, *) {
+            var config = self.configuration
+            if config != nil {
+                var bgConfig = UIBackgroundConfiguration.clear()
+                bgConfig.image = bgImage
+                config?.background = bgConfig
+                self.configuration = config
+                return self
+            }
+        }
+        self.setBackgroundImage(bgImage, for: .normal)
+        return self
+    }
+}
+
+public extension UIButton {
+    /// 添加富文本
+    @available(iOS 15, *)
+    @discardableResult
+    func fan_add(attrStr:AttributedString? = nil) -> Self{
+        var config = self.configuration
+        if config != nil {
+            config?.attributedTitle = attrStr
+            self.configuration = config
+            return self
+        }
+        if attrStr != nil {
+            self.setAttributedTitle(NSAttributedString(attrStr!), for: .normal)
+        }
         return self
     }
 }

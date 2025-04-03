@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CryptoKit
 
 //MARK: - String字符串扩展
 
@@ -88,12 +89,74 @@ public extension String {
             String(format: "%c" , $0)
         }.joined(separator: "") ?? ""
     }
+    
+}
+// MARK: - 字符串加密
+public extension String {
     ///获取字符串Md5
     var fan_md5:String{
         guard let data = data(using: .utf8) else{
             return ""
         }
         return data.fan_md5
+    }
+    ///获取字符串sha256
+    var fan_sha256:String{
+        guard let data = data(using: .utf8) else{
+            return ""
+        }
+        return data.fan_sha256
+    }
+    var fan_base64Encode:String{
+        guard let data = data(using: .utf8) else{
+            return ""
+        }
+        return data.base64EncodedString()
+    }
+    var fan_base64Decode:String{
+        guard let data = Data(base64Encoded: self) else{
+            return ""
+        }
+        return .init(data: data, encoding: .utf8) ?? ""
+    }
+    // AES 加密
+    @available(iOS 13.0, *)
+    func fan_aesEncrypt(_ key: String) -> String {
+        guard let keyData = key.data(using: .utf8) else {
+            return ""
+        }
+        guard let data = Data(base64Encoded: self) else{
+            return ""
+        }
+        // 使用 SHA256 哈希将任意长度密钥转换为 256 位（32字节）密钥
+        let hashedKey = SHA256.hash(data: keyData)
+        let symmetricKey = SymmetricKey(data: hashedKey)
+        guard let sealedBox = try? AES.GCM.seal(data, using: symmetricKey) else{
+            return ""
+        }
+        guard let miStr = sealedBox.combined?.base64EncodedString() else{
+            return ""
+        }
+        return miStr
+    }
+
+    // AES 解密
+    @available(iOS 13.0, *)
+    func fan_aesDecrypt(_ key: String) -> String {
+        guard let keyData = key.data(using: .utf8) else {
+            return ""
+        }
+        guard let data = Data(base64Encoded: self),
+              let sealedBox = try? AES.GCM.SealedBox(combined: data) else {
+            return ""
+        }
+        // 使用 SHA256 哈希将任意长度密钥转换为 256 位（32字节）密钥
+        let hashedKey = SHA256.hash(data: keyData)
+        let symmetricKey = SymmetricKey(data: hashedKey)
+        guard let decryptedData = try? AES.GCM.open(sealedBox, using: symmetricKey),let deStr = String(data: decryptedData, encoding: .utf8) else {
+            return ""
+        }
+        return deStr
     }
 }
 

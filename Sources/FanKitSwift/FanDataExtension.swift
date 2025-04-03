@@ -7,7 +7,7 @@
 
 import Foundation
 import CommonCrypto
-
+import CryptoKit
 
 //MARK: - NSDictionary处理
 /// NSDictionary读取扩展
@@ -371,7 +371,24 @@ public extension Data{
             String(format:"%02x",$0)
         }.joined()
     }
-
+    ///获取字符串sha256--CommonCrypto框架，支持更旧版本 CryptoKit = iOS13
+    var fan_sha256:String{
+        if #available(iOS 13.0, *) {
+            let hashData = SHA256.hash(data: self)
+            let hashString = hashData.compactMap {
+                String(format: "%02x", $0)
+            }.joined()
+            return hashString
+        }else{
+            var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+            _ = self.withUnsafeBytes { bytes in
+                return CC_SHA256(bytes.baseAddress, CC_LONG(self.count), &digest)
+            }
+            return digest.map {
+                String(format:"%02x",$0)
+            }.joined()
+        }
+    }
 }
 /// 整型数据转Data
 public extension ExpressibleByIntegerLiteral {
