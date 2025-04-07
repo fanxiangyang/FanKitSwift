@@ -11,7 +11,7 @@ import UIKit
 
 
 /// 轴-这种类似枚举的写法
-public struct FanAxis : RawRepresentable {
+public struct FanAxis : RawRepresentable, Sendable {
     public var rawValue: String
     
     public init(rawValue: String){

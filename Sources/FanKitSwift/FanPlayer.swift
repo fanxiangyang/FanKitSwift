@@ -33,8 +33,9 @@ import AVFoundation
         playerLayer = nil
     }
 }
-///视频播放的
-@objcMembers public class FanPlayer:NSObject{
+///视频播放的支持Swift6了，但是版本限制iOS13.0
+@available(iOS 13.0, *)
+@MainActor @objcMembers public class FanPlayer:NSObject ,@unchecked Sendable{
     ///播放视频的View-需要提前初始化
     public weak var playerView:FanPlayerView?
     ///初始化View
@@ -151,12 +152,14 @@ import AVFoundation
         // 监听缓冲进度改变
         self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "loadedTimeRanges", options: .new, context: nil)
         timeObser = avPlayer?.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 1), queue: DispatchQueue.main, using: {[weak self] cTime in
-            guard let current = self?.avPlayer?.currentItem?.currentTime().seconds ,current > 0.0 else {return}
-            guard let duration = self?.avPlayer?.currentItem?.duration.seconds ,duration > 0.0 else {return}
-            if !current.isNaN && !duration.isNaN {
-                let progress = min(current/duration, 1.0)
-//                print("播放进度===：\(progress)")
-                self?.playChange(progress: progress)
+            Task{@MainActor in
+                guard let current = self?.avPlayer?.currentItem?.currentTime().seconds ,current > 0.0 else {return}
+                guard let duration = self?.avPlayer?.currentItem?.duration.seconds ,duration > 0.0 else {return}
+                if !current.isNaN && !duration.isNaN {
+                    let progress = min(current/duration, 1.0)
+                    //print("播放进度===：\(progress)")
+                    self?.playChange(progress: progress)
+                }
             }
         })
         
@@ -186,24 +189,26 @@ import AVFoundation
     }
     ///监听播放的进度+状态
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "status" {
-            if avPlayer?.status == .readyToPlay {
-                //开始播放
-            }else  if avPlayer?.status == .unknown {
-                //播放未知
-            }else  if avPlayer?.status == .failed {
-                //播放失败
-            }
-//            print("播放状态：\(String(describing: avPlayer?.status))")
-        }else if keyPath == "loadedTimeRanges" {
-            //缓存进度
-            guard let timeRange = avPlayer?.currentItem?.loadedTimeRanges.first?.timeRangeValue else {return}
-            let loadingTime = timeRange.start.seconds + timeRange.duration.seconds
-            guard let duration = avPlayer?.currentItem?.duration.seconds ,duration > 0.0 else {return}
-            if duration.isNaN == false {
-                let progress = min(abs(loadingTime/duration),1.0)
-                loadedCacheBlock?(progress)
-//                print("缓存播放进度\(progress)")
+        Task{ @MainActor in
+            if keyPath == "status" {
+                if avPlayer?.status == .readyToPlay {
+                    //开始播放
+                }else  if avPlayer?.status == .unknown {
+                    //播放未知
+                }else  if avPlayer?.status == .failed {
+                    //播放失败
+                }
+                //print("播放状态：\(String(describing: avPlayer?.status))")
+            }else if keyPath == "loadedTimeRanges" {
+                //缓存进度
+                guard let timeRange = avPlayer?.currentItem?.loadedTimeRanges.first?.timeRangeValue else {return}
+                let loadingTime = timeRange.start.seconds + timeRange.duration.seconds
+                guard let duration = avPlayer?.currentItem?.duration.seconds ,duration > 0.0 else {return}
+                if duration.isNaN == false {
+                    let progress = min(abs(loadingTime/duration),1.0)
+                    loadedCacheBlock?(progress)
+                    //print("缓存播放进度\(progress)")
+                }
             }
         }
     }
