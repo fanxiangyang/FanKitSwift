@@ -52,12 +52,12 @@ public enum FanIPType : String {
         }
         return nil
     }
-    /// JSON字符串转字典
+    /// JSON字符串转数组
     public static func fan_array(_ jsonStr:String?)->[Any]?{
         let data = jsonStr?.data(using: .utf8)
         return fan_array(jsonData: data)
     }
-    /// json文件路径转字典
+    /// json文件路径转数组
     public static func fan_array(jsonPath:String?)->[Any]?{
         guard let jsonPath = jsonPath else{
             return nil
@@ -71,7 +71,7 @@ public enum FanIPType : String {
         }
         return nil
     }
-    /// jsonData转字典
+    /// jsonData转数组
     public static func fan_array(jsonData:Data?)->[Any]?{
         guard let data = jsonData else{
             return nil
@@ -84,6 +84,50 @@ public enum FanIPType : String {
             return dic
         }
         return nil
+    }
+    ///字典转换成JSON 字符串
+    public static func fan_string(dic: [String: Any]) -> String {
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: dic,
+                options: .prettyPrinted
+            )
+            let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
+            return jsonString
+        } catch {
+            print("字典转换JSON字符串失败: \(error.localizedDescription)")
+            return ""
+        }
+    }
+    /// 数组转换成JSON字符串
+    public static func fan_string(arr: [Any]) -> String {
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: arr,
+                options: .prettyPrinted
+            )
+            let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
+            return jsonString
+        } catch {
+            print("数组转换JSON字符串失败: \(error.localizedDescription)")
+            return ""
+        }
+    }
+    ///字典写入文件 [String:Any]
+    public static func fan_write(dic: [String: Any], toFile filePath: String) -> Bool {
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: dic,
+                options: .prettyPrinted
+            )
+            if let url = URL(fanFilePath: filePath) {
+                try jsonData.write(to:url)
+            }
+            return true
+        } catch {
+            print("JSON写入失败: \(error.localizedDescription)")
+            return false
+        }
     }
     //MARK: - 文件处理
     /// 获取沙河【Documents】路径
@@ -107,7 +151,7 @@ public enum FanIPType : String {
         //NSTemporaryDirectory()生成的带/private/var---/tmp/
         var path = NSTemporaryDirectory()
         if path.count <= 0 {
-            path = NSHomeDirectory().appending("/tmp")
+            path = NSHomeDirectory().appending("/tmp/")
         }
         return path
     }
@@ -121,7 +165,10 @@ public enum FanIPType : String {
         }
         return false
     }
-    
+    /// 是否只存在路径或者文件
+    public static func fan_pathExists(atPath:String)->Bool{
+        return FileManager.default.fileExists(atPath: atPath)
+    }
     ///自动创建路径-（默认不包括含后缀名的文件名）
     /// - Parameters:
     ///   - atPath: 创建路径
@@ -469,5 +516,36 @@ public extension FanTool {
         let dic = fan_allIPAddress()
         let ip = dic[ipType.rawValue]
         return ip
+    }
+}
+// MARK: - 模型数据转换处理
+extension FanTool{
+    //json文件转模型
+    static func fan_jsonLoad<T: Decodable>(_ filePath: String, as type: T.Type = T.self) throws  -> T where T : Decodable{
+        let data: Data
+        guard let file = URL(fanFilePath: filePath)
+            else {
+                fatalError("Couldn't find \(filePath) in Path.")
+        }
+        do {
+            data = try Data(contentsOf: file)
+        } catch {
+            fatalError("Couldn't load \(filePath) from path:\n\(error)")
+        }
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            fatalError("Couldn't parse \(filePath) as \(T.self):\n\(error)")
+        }
+    }
+    /// json-Data转模型
+    static func fan_jsonLoad<T: Decodable>(_ data: Data, as type: T.Type = T.self) throws -> T where T : Decodable {
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            fatalError("Couldn't parse data as \(T.self):\n\(error)")
+        }
     }
 }

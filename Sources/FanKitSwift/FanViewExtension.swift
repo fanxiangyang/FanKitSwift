@@ -121,7 +121,7 @@ import UIKit
     ///创建StackView 默认垂直居中填充
     class func fan_stackView(spacing:CGFloat,axis:NSLayoutConstraint.Axis = .vertical) -> UIStackView {
         let stackView = UIStackView()
-        stackView.axis = .horizontal
+        stackView.axis = axis
         stackView.distribution = .fill
         stackView.alignment = .center
         stackView.spacing = spacing
