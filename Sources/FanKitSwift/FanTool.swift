@@ -519,7 +519,7 @@ public extension FanTool {
     }
 }
 // MARK: - 模型数据转换处理
-extension FanTool{
+public extension FanTool{
     //json文件转模型
     static func fan_jsonLoad<T: Decodable>(_ filePath: String, as type: T.Type = T.self) throws  -> T where T : Decodable{
         let data: Data
