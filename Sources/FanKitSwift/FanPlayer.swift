@@ -71,6 +71,8 @@ import AVFoundation
     private var timeObser:Any?
     ///是否循环播放
     public var loopPlay:Bool = false
+    /// 是否已经添加监听
+    private var isPlayerObserver = false
     
     /// 加载进度
     public var loadedCacheBlock:((Double) -> Void)?
@@ -128,6 +130,10 @@ import AVFoundation
         self.avPlayer?.pause()
         self.removeObserverListen()
     }
+    ///暂停
+    public func pause() {
+        self.avPlayer?.pause()
+    }
     /// 重新重头播放
     public func rePlay(){
         playState = 0
@@ -146,23 +152,27 @@ import AVFoundation
     }
     ///添加监听播放状态，进度
     public func addObserverListen() {
-        playState = 0
-        // 监听状态改变
-        self.avPlayer?.addObserver(self, forKeyPath: "status", options: .new, context: nil)
-        // 监听缓冲进度改变
-        self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "loadedTimeRanges", options: .new, context: nil)
-        timeObser = avPlayer?.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 1), queue: DispatchQueue.main, using: {[weak self] cTime in
-            Task{@MainActor in
-                guard let current = self?.avPlayer?.currentItem?.currentTime().seconds ,current > 0.0 else {return}
-                guard let duration = self?.avPlayer?.currentItem?.duration.seconds ,duration > 0.0 else {return}
-                if !current.isNaN && !duration.isNaN {
-                    let progress = min(current/duration, 1.0)
-                    //print("播放进度===：\(progress)")
-                    self?.playChange(progress: progress)
+        objc_sync_enter(self)
+        if isPlayerObserver == false {
+            playState = 0
+            // 监听状态改变
+            self.avPlayer?.addObserver(self, forKeyPath: "status", options: .new, context: nil)
+            // 监听缓冲进度改变
+            self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "loadedTimeRanges", options: .new, context: nil)
+            timeObser = avPlayer?.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 1), queue: DispatchQueue.main, using: {[weak self] cTime in
+                Task{@MainActor in
+                    guard let current = self?.avPlayer?.currentItem?.currentTime().seconds ,current > 0.0 else {return}
+                    guard let duration = self?.avPlayer?.currentItem?.duration.seconds ,duration > 0.0 else {return}
+                    if !current.isNaN && !duration.isNaN {
+                        let progress = min(current/duration, 1.0)
+                        //print("播放进度===：\(progress)")
+                        self?.playChange(progress: progress)
+                    }
                 }
-            }
-        })
-        
+            })
+            isPlayerObserver = true
+        }
+        objc_sync_exit(self)
     }
     ///播放进度改变
     private func playChange(progress:Double){
@@ -182,10 +192,17 @@ import AVFoundation
     }
     ///移除监听播放状态，进度
     public func removeObserverListen(){
-        self.avPlayer?.removeObserver(self, forKeyPath: "status")
-        self.avPlayer?.currentItem?.removeObserver(self, forKeyPath: "loadedTimeRanges")
-        guard let timeObser = timeObser else { return }
-        self.avPlayer?.removeTimeObserver(timeObser)
+        objc_sync_enter(self)
+        if isPlayerObserver {
+            self.avPlayer?.removeObserver(self, forKeyPath: "status")
+            self.avPlayer?.currentItem?.removeObserver(self, forKeyPath: "loadedTimeRanges")
+            if let timeObser = timeObser {
+                self.avPlayer?.removeTimeObserver(timeObser)
+            }
+            timeObser = nil
+            isPlayerObserver = false
+        }
+        objc_sync_exit(self)
     }
     ///监听播放的进度+状态
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
