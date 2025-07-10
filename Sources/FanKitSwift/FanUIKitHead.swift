@@ -95,13 +95,13 @@ public func FanImage(bundleName : String,fileName:String) -> UIImage? {
 
 //MARK: -  全局引用类快捷调用方法或属性
 /// 屏幕宽
-@MainActor public var FanWidth : CGFloat {
+public var FanWidth : CGFloat {
     get {
         return FanUIKitTool.fan_width
     }
 }
 ///屏幕高
-@MainActor public var FanHeight : CGFloat {
+public var FanHeight : CGFloat {
     get {
         return FanUIKitTool.fan_height
     }

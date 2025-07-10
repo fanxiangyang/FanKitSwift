@@ -169,7 +169,7 @@ import UIKit
     ///   - autoScale: 是否自动屏幕倍数图片-默认true
     ///   - scale: 缩放倍数，默认2倍图
     /// - Returns: 截图图片
-    @MainActor static func fan_image(snapshotView:UIView?, autoScale:Bool = true,scale:CGFloat = 2.0) -> UIImage? {
+    static func fan_image(snapshotView:UIView?, autoScale:Bool = true,scale:CGFloat = 2.0) -> UIImage? {
         guard let snapshotView  = snapshotView else {
             return nil
         }

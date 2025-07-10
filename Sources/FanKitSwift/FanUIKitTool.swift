@@ -9,7 +9,7 @@ import UIKit
 
 //MARK: -  关于UIKit的工具方法
 /// 关于UIKit的工具方法
-@MainActor @objcMembers public class FanUIKitTool : NSObject {
+@objcMembers public class FanUIKitTool : NSObject {
     //MARK: - UIWindow相关
     
     @available(iOS 13.0, *)

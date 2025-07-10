@@ -5,7 +5,7 @@ A Swift Tool Kit collection of iOS components(一个iOS Swift 集成实用工具
 
 ## Introduce（介绍）
 
-FanKitSwift 是一组庞大、功能丰富的 iOS 组件。
+FanKitSwift 是一组庞大、功能丰富的 iOS 组件。（支持Swift6)
 对于OC支持，部分类功能做了兼容，一些全局方法 没有做适配，建议自己直接写成宏，
 或内联函数，或者用到部分函数自己再用类封装一层
 
@@ -20,13 +20,13 @@ FanKitSwift 是一组庞大、功能丰富的 iOS 组件。
 * FanDataExtension Data Int数据转换
 * FanImageExtension 图片裁剪+缩放+截图等方法
 * FanViewExtension View VC扩展
-* FanPlayer 音视频播放器（iOS13+支持Swift6限制的)
+* FanPlayer 音视频播放器
 * FanSwiftUI SwiftUI相关-目前待完善
 
 
 ### SPM（安装）支持
 
-1. git tag = `1.0.3` 支持Swift6.0版本
+1. git tag = `1.0.7` 支持Swift6.0版本
 
 ### 手动安装
 
@@ -54,6 +54,9 @@ FanKitSwift该项目最低推荐支持 iOS 13.0。
 * 1.常用数据处理，Data,String,字典，文件
 * 2.FanPlayer 音视频播放器
 * 3.全局方法，快捷调用
+### Release 1.0.3 支持Swift6
+### Release 1.0.7 
+* 1.播放器改动，去掉不是必须的@MainActor
 
 Like(喜欢)
 ==============
