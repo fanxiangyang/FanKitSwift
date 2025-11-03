@@ -52,4 +52,8 @@ public extension Date {
     var fan_second:Int {
         return Calendar.current.component(.second, from: self)
     }
+    ///下一天
+    var fan_nextDay:Date? {
+        return Calendar.current.date(byAdding: .day, value: 1, to: self)
+    }
 }

@@ -175,10 +175,61 @@ public extension URL {
     ///默认百分号编码的去掉【 file://User 】
     var fan_path:String{
         if #available(iOS 16.0, *) {
-            return self.path()
+            return self.path(percentEncoded: false)
         } else {
             return self.path
         }
     }
     
+}
+// MARK: - 表情符号处理
+public extension String {
+    /// 返回去掉所有 emoji 后的新字符串
+    func fan_removingEmojis() -> String {
+        self.filter { !$0.fan_isEmojiLike }
+    }
+}
+
+public extension Character {
+    //"Hello😀👍🏽❤️🎉🏳️‍🌈 👨‍👩‍👧‍👦 🇨🇳 #️⃣ 1️⃣ 文本♥︎ ☀️" 这些是特殊的❤️♥︎ ☀️
+    /// 判断该“字符”（扩展字形簇）是否表现为 Emoji（含组合/变体）
+    var fan_isEmojiLike: Bool {
+        // 1) 常规/带展示形式的 emoji（大部分）
+        if unicodeScalars.contains(where: { s in
+            s.properties.isEmoji &&
+            (s.properties.isEmojiPresentation) // 覆盖 SMP 区域大量 emoji
+        }) {
+            return true
+        }
+        
+        let legacyEmojiRanges: [ClosedRange<UInt32>] = [
+//            0x1F000...0x1FAFF, // SMP 大区（1F000+），补充兜底
+            0x2600...0x26FF, // Misc Symbols（☀☁☂♠♥♣♦ 等）
+            0x2700...0x27BF  // Dingbats（✔✖✳✴❄❌ 等，含 U+2764 ❤）
+        ]
+        // B) 旧符号区：2600–26FF、2700–27BF（♥、☀ 等）
+        if unicodeScalars.contains(where: { s in
+            legacyEmojiRanges.contains { $0.contains(s.value) }
+        }) {
+            return true
+        }
+//        let smpEmojiRange: ClosedRange<UInt32> = 0x1F000...0x1FAFF // 大量现代 emoji 所在区
+//        // C) SMP 大区（1F000+），补充兜底
+//        if unicodeScalars.contains(where: { smpEmojiRange.contains($0.value) }) {
+//            return true
+//        }
+        // 3) 国旗（区域指示符，需要成对）
+        let risCount = unicodeScalars.filter { (0x1F1E6...0x1F1FF).contains($0.value) }.count
+        if risCount >= 2 { return true }
+
+        let emojiSpecialScalars: Set<UInt32> = [
+            0x200D, // ZWJ 组合（例如家庭、职业、跨性别等组合）
+            0xFE0F, // VS16（emoji 展示）
+            0xFE0E, // VS15（文本展示）
+            0x20E3  // 键帽序列（0-9/#/* + VS16 + U+20E3）
+        ]
+        if unicodeScalars.contains(where: { emojiSpecialScalars.contains($0.value) }) { return true }
+
+        return false
+    }
 }

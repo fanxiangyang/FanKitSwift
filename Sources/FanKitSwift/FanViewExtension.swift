@@ -176,6 +176,18 @@ import UIKit
 }
 
 @objc public extension UIButton {
+    /// 默认创建button+内间距
+    class func fan_btn(edge:UIEdgeInsets = .zero) -> UIButton {
+        let btn = UIButton(type: .custom)
+        if #available(iOS 15.0, *) {
+            var config = Configuration.plain()
+            config.contentInsets = NSDirectionalEdgeInsets(top: edge.top, leading: edge.left, bottom: edge.bottom, trailing: edge.right)
+            btn.configuration = config
+        } else {
+            btn.contentEdgeInsets = edge
+        }
+        return btn
+    }
     ///创建只有文本的按钮+内间距 （文本只支持单行和多行，不支持固定2行）
     class func fan_btn(title:String?,textColor:UIColor,font:UIFont,edge:UIEdgeInsets = .zero) -> UIButton {
         let btn = UIButton(type: .custom)

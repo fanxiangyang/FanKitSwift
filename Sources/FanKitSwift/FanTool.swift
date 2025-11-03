@@ -548,4 +548,41 @@ public extension FanTool{
             fatalError("Couldn't parse data as \(T.self):\n\(error)")
         }
     }
+    /// model类转换成json字符串
+    /// - Parameter value: 支持Encodable协议的类，可以是数组，字典
+    /// - Parameter pretty: 是否美化打印 -无
+    /// - Parameter sortedKeys: 是否排序key -无
+    /// - Parameter withoutEscapingSlashes: 没有转义斜杠 - 有
+    /// - Parameter dateStrategy: 日期策略
+    /// - Parameter keyStrategy: 默认用户自己命名的key
+    /// - Returns: json字符串
+    static func fan_jsonString<T: Encodable>(
+        _ value: T,
+        pretty: Bool = false,
+        sortedKeys: Bool = false,
+        withoutEscapingSlashes: Bool = false,
+        dateStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate,
+        keyStrategy: JSONEncoder.KeyEncodingStrategy = .useDefaultKeys
+    ) -> String? {
+        let encoder = JSONEncoder()
+        var fmt: JSONEncoder.OutputFormatting = []
+        if pretty { fmt.insert(.prettyPrinted) }
+        if sortedKeys { fmt.insert(.sortedKeys) }                 // iOS 11+
+        if withoutEscapingSlashes {
+            if #available(iOS 13.0, *) {
+                fmt.insert(.withoutEscapingSlashes)
+            }
+        } // iOS 13+
+        encoder.outputFormatting = fmt
+        encoder.dateEncodingStrategy = dateStrategy
+        encoder.keyEncodingStrategy = keyStrategy
+        var jsonStr:String?
+        do {
+            let data = try encoder.encode(value)
+            jsonStr = String(data: data, encoding: .utf8);
+        } catch {
+            print("对象转JSON error:\(error)")
+        }
+        return jsonStr
+    }
 }

@@ -237,3 +237,26 @@ public extension Color {
         )
     }
 }
+
+// MARK: - View相关扩展
+@available(iOS 13.0, *)
+public extension View {
+    @ViewBuilder
+    /// iPad强制修改样式
+    func fan_presentationCompactAdaptationForiPad() -> some View {
+        if #available(iOS 16.4, *) {
+            self.presentationCompactAdaptation(.sheet)
+        } else {
+            self
+        }
+    }
+    @ViewBuilder
+    /// 顶部导航条是否隐藏
+    func fan_navigationBarHidden(_ hidden:Bool) -> some View {
+        if #available(iOS 16.0, *) {
+            self.toolbar(hidden ? .hidden : .visible,for: .navigationBar)
+        } else {
+            self.navigationBarHidden(hidden)
+        }
+    }
+}

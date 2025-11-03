@@ -17,11 +17,29 @@ public extension Dictionary where Key == String {
     }
     ///获取Int8
     func fan_int8(_ key: String) -> Int8 {
-        return self[key] as? Int8 ?? 0
+        if let v = self[key] as? Int {
+            return Int8(v)
+        }
+        if let v = self[key] as? Int8 {
+            return v
+        }
+        if let v = self[key] as? String, let intVal = Int8(v) {
+            return intVal
+        }
+        return 0
     }
     ///获取UInt8
     func fan_uint8(_ key: String) -> UInt8 {
-        return self[key] as? UInt8 ?? 0
+        if let v = self[key] as? Int {
+            return UInt8(v)
+        }
+        if let v = self[key] as? UInt8 {
+            return v
+        }
+        if let v = self[key] as? String, let intVal = UInt8(v) {
+            return intVal
+        }
+        return 0
     }
     ///获取Int
     func fan_int(_ key: String) -> Int {
@@ -29,7 +47,16 @@ public extension Dictionary where Key == String {
     }
     ///获取Int
     func fan_int16(_ key: String) -> Int16 {
-        return self[key] as? Int16 ?? 0
+        if let v = self[key] as? Int {
+            return Int16(v)
+        }
+        if let v = self[key] as? Int16 {
+            return v
+        }
+        if let v = self[key] as? String, let intVal = Int16(v) {
+            return intVal
+        }
+        return 0
     }
     ///获取Int32
     func fan_int32(_ key: String) -> Int32 {
