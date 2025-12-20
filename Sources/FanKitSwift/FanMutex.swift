@@ -103,6 +103,11 @@ public struct FanLock<T> {
             os_unfair_lock_unlock(&lock.unfairLock)
         }
     }
+    // ✅ 让 $x 能访问 wrapper
+    public var projectedValue: FanLock<T> {
+        get { self }
+        set { self = newValue }
+    }
     ///禁止在 withLock{} 内部调用同一个对象的 withLock/wrappedValue
     public mutating func withLock<R>(_ body: (inout T) -> R) -> R {
         os_unfair_lock_lock(&lock.unfairLock)
