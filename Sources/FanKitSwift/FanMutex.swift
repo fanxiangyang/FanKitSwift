@@ -67,7 +67,15 @@ final public class FanAtomic<Value> {
         return oldValue
     }
 }
-
+///禁止在 withLock{} 内部调用同一个对象的 load/store/exchange/withLock/wrappedValue
+public extension FanAtomic {
+    @discardableResult
+    func withLock<R>(_ body: (inout Value) -> R) -> R {
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
+        return body(&_value)
+    }
+}
 
 final class FanUnfairLockBox {
     var unfairLock = os_unfair_lock_s()
@@ -94,5 +102,27 @@ public struct FanLock<T> {
             value = newValue
             os_unfair_lock_unlock(&lock.unfairLock)
         }
+    }
+    ///禁止在 withLock{} 内部调用同一个对象的 withLock/wrappedValue
+    public mutating func withLock<R>(_ body: (inout T) -> R) -> R {
+        os_unfair_lock_lock(&lock.unfairLock)
+        defer { os_unfair_lock_unlock(&lock.unfairLock) }
+        return body(&value)
+    }
+}
+///数组添加的语义化方法
+public extension FanLock where T: RangeReplaceableCollection {
+    mutating func append(_ element: T.Element) {
+        os_unfair_lock_lock(&lock.unfairLock)
+        defer { os_unfair_lock_unlock(&lock.unfairLock) }
+        value.append(element)
+    }
+}
+/// 字典添加的专用扩展
+public extension FanLock where T == [String: Int] {
+    mutating func increment(key: String) {
+        os_unfair_lock_lock(&lock.unfairLock)
+        defer { os_unfair_lock_unlock(&lock.unfairLock) }
+        value[key, default: 0] += 1
     }
 }

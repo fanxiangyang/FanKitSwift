@@ -271,6 +271,39 @@ public enum FanIPType : String {
             print("源文件夹不存在:\(sourcePath)")
         }
     }
+    ///强制copy文件到目的全路径，旧文件被删除
+    public static func fan_copy(at:URL,to:URL,removeOld:Bool = true)->Bool{
+        let atPath = at.fan_path
+        let toPath = to.fan_path
+        if (atPath ==  toPath){
+            return true
+        }
+        _ = fan_create(atPath: toPath,deleteLastPath: true)
+        var result = false
+        let file = FileManager.default
+        //判断是存在旧文件删除-文件夹不处理
+        var isDir:ObjCBool = false
+        if file.fileExists(atPath: toPath,isDirectory: &isDir) {
+            if isDir.boolValue == false {
+                if removeOld{
+                    try? file.removeItem(at: to)
+                }
+                try? file.copyItem(at: at, to: to)
+            }else{
+                //是路径不处理
+            }
+        }else{
+            try? file.copyItem(at: at, to: to)
+        }
+        //再次校验文件是否copy成功
+        var isCopyDir:ObjCBool = false
+        if file.fileExists(atPath: toPath,isDirectory: &isCopyDir) {
+            if isCopyDir.boolValue == false {
+                result = true
+            }
+        }
+        return result
+    }
     /// 只删除文件，不删除路径
     public static func fan_deleteFile(_ atPath:String) -> Bool {
         var result = false

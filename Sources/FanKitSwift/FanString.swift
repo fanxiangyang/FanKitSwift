@@ -49,8 +49,13 @@ public extension String {
     /// 获取文件名不包含后缀
     var fan_fileName: String {
         let name = self.fan_lastPathComponent
-        let arr = name.components(separatedBy: ".")
-        return arr.first ?? ""
+        var arr:[String] = name.components(separatedBy: ".")
+        if arr.count <= 2{
+            return arr.first ?? ""
+        }else{
+            arr.removeLast()
+            return arr.joined(separator: ".")
+        }
     }
     /// 获取文件路径，无视无后缀名的文件
     var fan_deleteLastPathComponent: String {

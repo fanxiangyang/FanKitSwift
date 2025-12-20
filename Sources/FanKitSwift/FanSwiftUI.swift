@@ -212,6 +212,7 @@ public struct FanRoundedCorner: Shape {
 }
 @available(iOS 13.0, *)
 public extension Color {
+    ///始化16进制 #FF00FF
     init(hex: String) {
         //CharacterSet.alphanumerics  0-9a-z inverted取反
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -236,6 +237,16 @@ public extension Color {
             opacity: Double(a) / 255
         )
     }
+    ///初始化16进制 0xFF00FF
+    init(fan_hex: UInt, alpha: Double = 1.0) {
+        self.init(
+            .sRGB,
+            red: Double((fan_hex >> 16) & 0xFF) / 255.0,
+            green: Double((fan_hex >> 8) & 0xFF) / 255.0,
+            blue: Double(fan_hex & 0xFF) / 255.0,
+            opacity: alpha
+        )
+    }
 }
 
 // MARK: - View相关扩展
@@ -257,6 +268,15 @@ public extension View {
             self.toolbar(hidden ? .hidden : .visible,for: .navigationBar)
         } else {
             self.navigationBarHidden(hidden)
+        }
+    }
+    @ViewBuilder
+    /// 隐藏homeBar ,否则自动
+    func fan_persistentSystemOverlays(_ hidden: Bool = true) -> some View {
+        if #available(iOS 16.0, *) {
+            self.persistentSystemOverlays(hidden ? .hidden : .automatic)
+        } else {
+            self
         }
     }
 }
