@@ -178,7 +178,8 @@ import AVFoundation
             if progress > 0 {
                 playState = 1
             }else {
-                avPlayer?.pause()
+                //多次触发，会出bug,进度卡主
+//                avPlayer?.pause()
                 avPlayer?.play()
             }
         }else {

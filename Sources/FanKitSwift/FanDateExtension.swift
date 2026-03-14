@@ -9,17 +9,23 @@ import Foundation
 
 public extension Date {
     ///日期字符串转换成Date（yyyy-MM-dd HH:mm:ss）
-    static func fan_date(from dateStr:String,format:String,timeZone:TimeZone = TimeZone.current) -> Date? {
+    static func fan_date(from dateStr:String,format:String,timeZone:TimeZone = TimeZone.current,locale:Locale? = nil) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = format
         formatter.timeZone = timeZone
+        if let locale = locale{
+            formatter.locale = locale
+        }
         return formatter.date(from: dateStr)
     }
     ///日期转换成需要的格式（yyyy-MM-dd HH:mm:ss）
-    func fan_format(_ format:String = "yyyy-MM-dd HH:mm:ss",timeZone:TimeZone = TimeZone.current) -> String {
+    func fan_format(_ format:String = "yyyy-MM-dd HH:mm:ss",timeZone:TimeZone = TimeZone.current,locale:Locale? = nil) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format
         formatter.timeZone = timeZone
+        if let locale = locale{
+            formatter.locale = locale
+        }
         return formatter.string(from: self)
     }
     /// 获取日历年月日时分秒格式
