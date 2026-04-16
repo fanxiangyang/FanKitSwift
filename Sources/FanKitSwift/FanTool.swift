@@ -391,33 +391,45 @@ public enum FanIPType : String {
             }
         }
     }
-    /// 获取文件或文件夹大小
-    public static func fan_folderSize(_ atPath: String) -> Int64 {
+    /// 获取文件或文件夹大小（递归统计文件大小）
+    /// - Parameters:
+    ///   - atPath: 文件或文件夹路径
+    ///   - options: 枚举配置，是否跳过隐藏文件/包内容
+    public static func fan_folderSize(_ atPath: String, options: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles]) -> Int64 {
         let fileManager = FileManager.default
+        var isDirectory: ObjCBool = false
+        guard fileManager.fileExists(atPath: atPath, isDirectory: &isDirectory) else {
+            return 0
+        }
+
+        if isDirectory.boolValue == false {
+            guard let fileAttributes = try? fileManager.attributesOfItem(atPath: atPath),
+                  let fileSize = fileAttributes[.size] as? NSNumber else {
+                return 0
+            }
+            return fileSize.int64Value
+        }
+
+        guard let url = URL(fanFilePath: atPath),
+              let enumerator = fileManager.enumerator(
+                at: url,
+                includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey],
+                options: options
+              ) else {
+            return 0
+        }
+
         var totalSize: Int64 = 0
-        var isDirectory:ObjCBool = false
-        if fileManager.fileExists(atPath: atPath,isDirectory: &isDirectory) {
-            if isDirectory.boolValue {
-                var options: FileManager.DirectoryEnumerationOptions = [.skipsSubdirectoryDescendants, .skipsHiddenFiles]
-                if #available(iOS 10.0, *) {
-                    options.insert(.skipsPackageDescendants)
+        for case let fileURL as URL in enumerator {
+            do {
+                let values = try fileURL.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
+                let isRegular = values.isRegularFile == true
+                if isRegular {
+                    totalSize += Int64(values.fileSize ?? 0)
+                    continue
                 }
-                do {
-                    guard let url = URL(fanFilePath: atPath) else { return 0 }
-                    let urls = try fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: options)
-                    for subUrl in urls {
-                        let fileSize = try fileManager.attributesOfItem(atPath: subUrl.fan_path)[FileAttributeKey.size]
-                        totalSize += (fileSize ?? 0) as! Int64
-                    }
-                } catch {
-                    print("Failed to get folder size: \(error)")
-                    return 0
-                }
-            } else {
-                guard let fileAttributes = try? fileManager.attributesOfItem(atPath: atPath) else {
-                    return 0
-                }
-                totalSize = (fileAttributes[FileAttributeKey.size] ?? 0) as! Int64
+            } catch {
+                continue
             }
         }
         return totalSize
